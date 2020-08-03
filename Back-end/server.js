@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const port = 8081
+const port = process.env.PORT || 8081
 var path = require('path');
 const googleTrends = require('google-trends-api');
 var fetch = require('node-fetch');
@@ -54,6 +54,35 @@ app.get('/index1/nyhome', async (req, res) => {
   app.get('/index1/world', async (req, res) => {
   
     const api_url = 'https://content.guardianapis.com/world?api-key=c0345a86-d258-42aa-b58e-272b1d93355e&show-blocks=all&page-size=20';
+    const fetch_response = await fetch(api_url);
+    const json1 = await fetch_response.json();
+    //console.log(json1.response.results)
+    
+    var array = []
+    for(i=0;i<json1.response.pageSize;i++)
+    {
+     if (json1.response.results[i].blocks.body[0].bodyTextSummary == "" || json1.response.results[i].webTitle == "" || json1.response.results[i].sectionId == "" || json1.response.results[i].webPublicationDate == "" )
+     {
+       console.log("bhai bhai",i)
+     }
+     else
+     {
+       array.push(json1.response.results[i])
+       if(array.length == 10)
+       {
+        console.log(" no bhaibhai",json1.response.pageSize)
+         break
+         
+       }
+     }
+    }
+   
+    res.json(array);
+  });
+
+  app.get('/index1/science', async (req, res) => {
+  
+    const api_url = 'https://content.guardianapis.com/science?api-key=c0345a86-d258-42aa-b58e-272b1d93355e&show-blocks=all&page-size=20';
     const fetch_response = await fetch(api_url);
     const json1 = await fetch_response.json();
     //console.log(json1.response.results)
@@ -204,6 +233,9 @@ app.get('/index1/nyhome', async (req, res) => {
     // console.log(json1.response.results)
     res.json(json1.results);
   });
+
+
+  
   
   
   
@@ -214,7 +246,6 @@ app.get('/index1/nyhome', async (req, res) => {
     const json1 = await fetch_response.json();
     //console.log(json1.response.results)
     var array = []
-    
     for(i=0;i<json1.response.pageSize;i++)
     {
      if (json1.response.results[i].blocks.body[0].bodyTextSummary == "" || json1.response.results[i].webTitle == "" || json1.response.results[i].sectionId == "" || json1.response.results[i].webPublicationDate == "" )
@@ -275,7 +306,7 @@ app.get('/index1/nyhome', async (req, res) => {
     const fetch_response = await fetch(api_url);
     const json1 = await fetch_response.json();
     var array = []
-    for(i=0;i<json1.response.results.length;i++)
+    for(i=0;i<json1.response.pageSize;i++)
     {
      if ( json1.response.results[i].webTitle == "" || json1.response.results[i].sectionId == "" || json1.response.results[i].webPublicationDate == "" )
      {
@@ -306,6 +337,8 @@ app.get('/index1/nyhome', async (req, res) => {
     // res.json(json1.response.docs);
     var array = []
     console.log(json1.response.docs.length)
+   
+
     
     for(i=0;i<json1.response.docs.length;i++)
     {
@@ -328,58 +361,6 @@ app.get('/index1/nyhome', async (req, res) => {
     res.json(array);
   });
 
-  app.get('/index1/trend', async (req, res) => {
-    const id1 = req.query.q
-    console.log("this is the query",id1)
-    googleTrends.interestOverTime({keyword:id1,startTime:new Date('2019-06-01')})
-    .then(function(results)
-    {
-    console.log(typeof(results))
-    var obj = JSON.parse(results)
-    console.log(typeof(obj))
-    var array = []
-    for(i=0;i<obj.default.timelineData.length;i++)
-    { 
-     array.push(obj.default.timelineData[i].value[0])
-    }
-    res.json(array)
-
-    console.log('These results are awesome', results); 
-    })
-    .catch(function(err){
-    console.error('Oh no there was an error', err);
-    });   
-    
-  });
-
-  app.get('/index1/science', async (req, res) => {
-  
-    const api_url = 'https://content.guardianapis.com/science?api-key=c0345a86-d258-42aa-b58e-272b1d93355e&show-blocks=all&page-size=20';
-    const fetch_response = await fetch(api_url);
-    const json1 = await fetch_response.json();
-    //console.log(json1.response.results)
-    
-    var array = []
-    for(i=0;i<json1.response.pageSize;i++)
-    {
-     if (json1.response.results[i].blocks.body[0].bodyTextSummary == "" || json1.response.results[i].webTitle == "" || json1.response.results[i].sectionId == "" || json1.response.results[i].webPublicationDate == "" )
-     {
-       console.log("bhai bhai",i)
-     }
-     else
-     {
-       array.push(json1.response.results[i])
-       if(array.length == 10)
-       {
-        console.log(" no bhaibhai",json1.response.pageSize)
-         break
-         
-       }
-     }
-    }
-   
-    res.json(array);
-  });
 
   app.get('/index1/top', async (req, res) => {
     const api_url = 'http://content.guardianapis.com/search?order-by=newest&show-fields=starRating,headline,thumbnail,short-url&api-key=c0345a86-d258-42aa-b58e-272b1d93355e';
@@ -390,6 +371,34 @@ app.get('/index1/nyhome', async (req, res) => {
   });
 
 
+  app.get('/index1/search', async (req, res) => {
+    const id1 = req.query.q
+    console.log("this is the search",id1)
+    const api_url = "https://content.guardianapis.com/search?q="+id1+"&api-key=c0345a86-d258-42aa-b58e-272b1d93355e&show-blocks=all";
+    const fetch_response = await fetch(api_url);
+    const json1 = await fetch_response.json();
+    var array = []
+    for(i=0;i<json1.response.pageSize;i++)
+    {
+     if ( json1.response.results[i].webTitle == "" || json1.response.results[i].sectionId == "" || json1.response.results[i].webPublicationDate == "" )
+     {
+       console.log("bhai bhai",i)
+     }
+     else
+     {
+       array.push(json1.response.results[i])
+       if(array.length == 10)
+       {
+        console.log("haa noi",json1.response.pageSize)
+         break
+         
+       }
+     }
+   
+    }
+    res.json(array);
+  });
+  
   app.get('/index1/trend', async (req, res) => {
     const id1 = req.query.q
     console.log("this is the query",id1)
@@ -414,7 +423,6 @@ app.get('/index1/nyhome', async (req, res) => {
     
   });
 
-  
 
   app.use('/static',express.static('build/static'));
  
@@ -423,5 +431,5 @@ app.get('/index1/nyhome', async (req, res) => {
     res.sendFile(path.join(__dirname+'/build/index.html'))
     // res.send("hi")
 } );
-
+  
 app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))

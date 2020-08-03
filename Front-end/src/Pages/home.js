@@ -125,6 +125,7 @@ class Customers extends Component {
 
 
   render() {
+    alert("Search box may not be giving you suggestions as i had used Microsoft Bing API for Auto search feature which is only free for 1 month :(")
     if (this.state.check) {
       return (
         <div className="sweet-loading">
