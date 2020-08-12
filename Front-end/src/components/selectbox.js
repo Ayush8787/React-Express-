@@ -17,11 +17,11 @@ class WithPromises extends Component {
     console.log("Value of search",inputValue)
     try {
       const response = await fetch(
-        `https://rajpatel.cognitiveservices.azure.com/bing/v7.0/suggestions?mkt=en-EN&q=${inputValue}`,
+        `https://ayushpatel.cognitiveservices.azure.com/bing/v7.0/suggestions?mkt=en-EN&q=${inputValue}`,
         
         {
           headers: {
-            "Ocp-Apim-Subscription-Key": "ac024cec74564fddaf6810bf13a1702a"
+            "Ocp-Apim-Subscription-Key": "ac024ush5etu87c74564fddaf3add9702a"
           }
         }
       );
